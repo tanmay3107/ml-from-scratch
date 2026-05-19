@@ -126,4 +126,4 @@ if __name__ == "__main__":
     for i in range(3):
         word = vocab[i]
         vector = embeddings[i]
-        print(f"'{word}': {np.round(vector, 3)}")
+        print(f"'{word}': {np.round(vector, 3)}")   
