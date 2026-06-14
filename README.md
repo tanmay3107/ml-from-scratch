@@ -83,3 +83,62 @@ python multiclass_mlp.py
 
 ---
 *Note: This repository is built for educational, structural, and mathematical transparency. For massive-scale production deployments utilizing distributed GPU clusters, refer to compiled frameworks (PyTorch/JAX).*
+# Local RAG Agent 📚🤖
+
+![Python](https://img.shields.io/badge/Python-3.10-blue)
+![FAISS](https://img.shields.io/badge/Vector_DB-FAISS-green)
+![HuggingFace](https://img.shields.io/badge/Framework-HuggingFace-orange)
+![Privacy](https://img.shields.io/badge/Privacy-100%25_Local-brightgreen)
+
+An enterprise-grade, privacy-first Retrieval-Augmented Generation (RAG) system built to run entirely on local architecture. This system ingests text documents, processes them using a mathematical sliding-window chunking strategy, indexes dense semantic embeddings using FAISS, and answers user queries deterministically via a local LLM without transmitting data to external APIs.
+
+**Author:** Tanmay Janak
+
+---
+
+## 🏗️ Architectural Overview
+
+A standard LLM often struggles with hallucinations and strict character context windows. This project mitigates those constraints by pairing high-dimensional geometric search with a localized generative model:
+
+1. **Sliding-Window Document Processor:** Breaks large text files down into configurable, overlapping token blocks to maintain sentence-level contextual continuity across chunk boundaries.
+2. **Dense Embedding Pipeline:** Leverages a lightweight, highly efficient HuggingFace sentence transformer (`all-MiniLM-L6-v2`) to convert raw text into 384-dimensional dense vectors.
+3. **High-Performance Indexing:** Uses C++ optimized Facebook AI Similarity Search (`FAISS`) to store vectors and calculate Euclidean ($L_2$) distances instantly during execution.
+4. **Deterministic Generation Engine:** Forwards the top-K retrieved context blocks into a structured `<|system|>` prompt wrapper, utilizing a low-temperature (`0.1`) local `TinyLlama` model to guarantee factuality.
+
+---
+
+## 📂 Repository Structure
+
+```text
+local-rag-agent/
+├── document_processor.py   # Sliding-window context parsing and regex text sanitization
+├── vector_database.py     # Embedding generation and FAISS vector index mechanics
+├── retrieval_pipeline.py  # Orchestrator handling distance threshold filtering
+└── rag_agent.py           # Local LLM generation and strict prompt templates
+```
+
+---
+
+## 🛠️ Local Setup & Execution
+
+### Prerequisites
+* Python 3.10+
+* An environment with access to a local CPU or standard consumer GPU (4GB+ VRAM recommended for smooth LLM execution).
+
+### 1. Install Project Dependencies
+```bash
+pip install torch transformers accelerate faiss-cpu sentence-transformers numpy
+```
+
+### 2. Run the Full RAG Pipeline
+Execute the primary agent script. It will automatically download the lightweight models on the first run, index the provided deployment text, accept a sample query, and generate an answer directly in your terminal.
+```bash
+python rag_agent.py
+```
+
+---
+
+## 🎯 Key Design Implementations
+
+* **Strict Boundary Filtering:** Instead of blindly passing the top $K$ database matches to the LLM, the pipeline implements an $L_2$ distance threshold filter. If the mathematical similarity drops below a reliable score, the chunk is automatically omitted to protect the context window from irrelevant noise.
+* **Zero-Cloud Dependency:** Every component—from document ingestion to final token generation—executes strictly within your local machine environment, ensuring absolute data privacy for confidential text files.
